@@ -7,6 +7,8 @@ import WaitingRoom from './components/WaitingRoom';
 import WinnerOverlay from './components/WinnerOverlay';
 import ClueHistory from './components/ClueHistory';
 import CluePopup from './components/CluePopup';
+import TeamSidebar from './components/TeamSidebar';
+import ScoreBoard from './components/ScoreBoard';
 
 function App() {
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -28,6 +30,9 @@ function App() {
 
   const myPlayer = gameState.players?.[playerId];
   const isSpymaster = myPlayer?.role === 'spymaster';
+
+  const redPlayers = Object.values(gameState.players || {}).filter(p => p.team === 'red');
+  const bluePlayers = Object.values(gameState.players || {}).filter(p => p.team === 'blue');
 
   return (
     <div className={`min-h-screen text-gray-900 flex flex-col transition-colors duration-500 ${gameState.currentTurn === 'red' ? 'bg-red-50' : 'bg-blue-50'
@@ -61,7 +66,7 @@ function App() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-start p-4 gap-6">
+      <main className="flex-1 flex flex-col p-4 overflow-x-hidden">
         {loading ? (
           <div className="flex items-center justify-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
@@ -75,29 +80,74 @@ function App() {
             onStartGame={actions.startGame}
           />
         ) : (
-          <>
-            <Controls
-              scores={gameState.scores}
-              currentTurn={gameState.currentTurn}
-              winner={gameState.winner}
-              isSpymaster={isSpymaster}
-              isMyTurn={myPlayer?.team === gameState.currentTurn}
-              isHost={myPlayer?.isHost || false}
-              onToggleSpymaster={() => { }}
-              onEndTurn={actions.endTurn}
-              onNewGame={actions.resetToLobby}
-              onGiveClue={actions.giveClue}
-              clueGiven={gameState.guessesRemaining !== null}
-            />
+          <div className="flex flex-col xl:flex-row items-start justify-center gap-6 max-w-[1600px] mx-auto w-full">
+            {/* Red Team Sidebar (Desktop Only) */}
+            <div className="hidden xl:block w-64 shrink-0 order-1">
+              <TeamSidebar
+                team="red"
+                players={redPlayers}
+                currentTurn={gameState.currentTurn}
+                currentPlayerId={playerId}
+              />
+            </div>
 
-            <GameBoard
-              board={gameState.board}
-              isSpymaster={isSpymaster}
-              onCardClick={actions.handleCardClick}
-              canInteract={!isSpymaster && !gameState.winner && myPlayer?.team === gameState.currentTurn}
-            />
+            {/* Main Game Area */}
+            <div className="flex-1 w-full max-w-4xl flex flex-col gap-6 order-2">
+              <ScoreBoard
+                scores={gameState.scores}
+                currentTurn={gameState.currentTurn}
+                winner={gameState.winner}
+              />
 
-            <ClueHistory clues={gameState.clues} currentTurn={gameState.currentTurn} />
+              {/* Mobile Teams (Side by Side) */}
+              <div className="xl:hidden flex gap-4 w-full">
+                <TeamSidebar
+                  team="red"
+                  players={redPlayers}
+                  currentTurn={gameState.currentTurn}
+                  currentPlayerId={playerId}
+                  className="flex-1"
+                />
+                <TeamSidebar
+                  team="blue"
+                  players={bluePlayers}
+                  currentTurn={gameState.currentTurn}
+                  currentPlayerId={playerId}
+                  className="flex-1"
+                />
+              </div>
+
+              <Controls
+                winner={gameState.winner}
+                isSpymaster={isSpymaster}
+                isMyTurn={myPlayer?.team === gameState.currentTurn}
+                isHost={myPlayer?.isHost || false}
+                onToggleSpymaster={() => { }}
+                onEndTurn={actions.endTurn}
+                onNewGame={actions.resetToLobby}
+                onGiveClue={actions.giveClue}
+                clueGiven={gameState.guessesRemaining !== null}
+              />
+
+              <GameBoard
+                board={gameState.board}
+                isSpymaster={isSpymaster}
+                onCardClick={actions.handleCardClick}
+                canInteract={!isSpymaster && !gameState.winner && myPlayer?.team === gameState.currentTurn}
+              />
+
+              <ClueHistory clues={gameState.clues} currentTurn={gameState.currentTurn} />
+            </div>
+
+            {/* Blue Team Sidebar (Desktop Only) */}
+            <div className="hidden xl:block w-64 shrink-0 order-3">
+              <TeamSidebar
+                team="blue"
+                players={bluePlayers}
+                currentTurn={gameState.currentTurn}
+                currentPlayerId={playerId}
+              />
+            </div>
 
             {gameState.winner && (
               <WinnerOverlay
@@ -108,7 +158,7 @@ function App() {
             )}
 
             <CluePopup clue={gameState.clues[gameState.clues.length - 1]} />
-          </>
+          </div>
         )}
       </main>
     </div>
