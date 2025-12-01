@@ -47,7 +47,8 @@ const Card: React.FC<CardProps> = ({ card, isSpymaster, onClick, disabled }) => 
                 getBackgroundColor(),
                 !revealed && !disabled && 'hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:shadow-sm cursor-pointer',
                 (revealed || disabled) && 'cursor-default',
-                revealed && type === 'neutral' && 'shadow-none border-transparent'
+                revealed && type === 'neutral' && 'shadow-none border-transparent',
+                revealed && 'animate-flip'
             )}
         >
             <span className={clsx(
