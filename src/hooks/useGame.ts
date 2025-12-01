@@ -13,6 +13,8 @@ const INITIAL_STATE: GameState = {
     status: 'lobby',
     players: {},
     hostId: '',
+    clues: [],
+    guessesRemaining: null,
 };
 
 export function useGame(roomId?: string) {
@@ -50,6 +52,8 @@ export function useGame(roomId?: string) {
                     players: data.players || {},
                     scores: data.scores || INITIAL_STATE.scores,
                     board: data.board || INITIAL_STATE.board,
+                    clues: data.clues || [],
+                    guessesRemaining: data.guessesRemaining === undefined ? null : data.guessesRemaining,
                 }));
             } else {
                 // Room doesn't exist yet, we'll create it when joining
@@ -148,6 +152,8 @@ export function useGame(roomId?: string) {
             winner: null,
             status: 'playing',
             lastUpdated: Date.now(),
+            clues: [],
+            guessesRemaining: null,
         };
 
         update(ref(db, `rooms/${roomId}`), updates);
@@ -161,6 +167,13 @@ export function useGame(roomId?: string) {
         const myPlayer = gameState.players[playerId];
         if (!myPlayer || myPlayer.role === 'spymaster') return;
         if (myPlayer.team !== gameState.currentTurn) return;
+
+        // Check if guesses are remaining
+        if (gameState.guessesRemaining !== null && gameState.guessesRemaining <= 0) return;
+        // Also if no clue has been given yet (guessesRemaining is null), maybe we shouldn't allow guessing?
+        // The requirement implies "number of correct tiles ... is number of words ... + 1".
+        // This implies they need a clue first.
+        if (gameState.guessesRemaining === null) return;
 
         const cardIndex = gameState.board.findIndex(c => c.id === cardId);
         if (cardIndex === -1) return;
@@ -181,10 +194,25 @@ export function useGame(roomId?: string) {
         // Check for winner
         let newWinner = checkWinner(newBoard, gameState.currentTurn);
 
-        // Determine next turn
+        // Determine next turn and guesses
         let nextTurn = gameState.currentTurn;
+        let newGuessesRemaining: number | null = gameState.guessesRemaining;
+
         if (card.type !== gameState.currentTurn) {
+            // Wrong guess (opponent or neutral or assassin)
+            // End turn immediately
             nextTurn = gameState.currentTurn === 'red' ? 'blue' : 'red';
+            newGuessesRemaining = null; // Reset for next team
+        } else {
+            // Correct guess
+            if (newGuessesRemaining !== null) {
+                newGuessesRemaining--;
+                if (newGuessesRemaining <= 0) {
+                    // Used all guesses
+                    nextTurn = gameState.currentTurn === 'red' ? 'blue' : 'red';
+                    newGuessesRemaining = null;
+                }
+            }
         }
 
         const updates = {
@@ -193,6 +221,7 @@ export function useGame(roomId?: string) {
             winner: newWinner,
             currentTurn: nextTurn,
             lastUpdated: Date.now(),
+            guessesRemaining: newGuessesRemaining,
         };
 
         if (roomId) {
@@ -210,6 +239,7 @@ export function useGame(roomId?: string) {
         update(ref(db, `rooms/${roomId}`), {
             currentTurn: nextTurn,
             lastUpdated: Date.now(),
+            guessesRemaining: null,
         });
     }, [gameState, roomId, playerId]);
 
@@ -226,6 +256,27 @@ export function useGame(roomId?: string) {
         });
     }, [roomId, playerId, gameState.players]);
 
+    const giveClue = useCallback((word: string, number: number) => {
+        if (!roomId || !gameState.currentTurn) return;
+        if (gameState.guessesRemaining !== null) return;
+
+        const newClue = {
+            word,
+            number,
+            team: gameState.currentTurn,
+            timestamp: Date.now(),
+        };
+
+        const currentClues = gameState.clues || [];
+        const updatedClues = [...currentClues, newClue];
+
+        update(ref(db, `rooms/${roomId}`), {
+            clues: updatedClues,
+            lastUpdated: Date.now(),
+            guessesRemaining: number + 1,
+        });
+    }, [roomId, gameState.currentTurn, gameState.clues]);
+
     return {
         gameState,
         loading,
@@ -238,6 +289,7 @@ export function useGame(roomId?: string) {
             handleCardClick,
             endTurn,
             resetToLobby,
+            giveClue,
         }
     };
 }

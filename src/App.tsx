@@ -5,6 +5,8 @@ import Controls from './components/Controls';
 import Lobby from './components/Lobby';
 import WaitingRoom from './components/WaitingRoom';
 import WinnerOverlay from './components/WinnerOverlay';
+import ClueHistory from './components/ClueHistory';
+import CluePopup from './components/CluePopup';
 
 function App() {
   const [roomId, setRoomId] = useState<string | null>(null);
@@ -28,7 +30,8 @@ function App() {
   const isSpymaster = myPlayer?.role === 'spymaster';
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900 flex flex-col">
+    <div className={`min-h-screen text-gray-900 flex flex-col transition-colors duration-500 ${gameState.currentTurn === 'red' ? 'bg-red-50' : 'bg-blue-50'
+      }`}>
       <header className="bg-white border-b border-gray-200 p-4 sticky top-0 z-10 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent cursor-pointer" onClick={() => setRoomId(null)}>
@@ -83,6 +86,8 @@ function App() {
               onToggleSpymaster={() => { }}
               onEndTurn={actions.endTurn}
               onNewGame={actions.resetToLobby}
+              onGiveClue={actions.giveClue}
+              clueGiven={gameState.guessesRemaining !== null}
             />
 
             <GameBoard
@@ -92,6 +97,8 @@ function App() {
               canInteract={!isSpymaster && !gameState.winner && myPlayer?.team === gameState.currentTurn}
             />
 
+            <ClueHistory clues={gameState.clues} currentTurn={gameState.currentTurn} />
+
             {gameState.winner && (
               <WinnerOverlay
                 winner={gameState.winner}
@@ -99,6 +106,8 @@ function App() {
                 onNewGame={actions.resetToLobby}
               />
             )}
+
+            <CluePopup clue={gameState.clues[gameState.clues.length - 1]} />
           </>
         )}
       </main>

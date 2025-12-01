@@ -6,14 +6,15 @@ interface LobbyProps {
 }
 
 const Lobby: React.FC<LobbyProps> = ({ onJoinRoom }) => {
-  const [roomId, setRoomId] = useState('');
-  const [name, setName] = useState('');
+  const [roomId, setRoomId] = useState(() => localStorage.getItem('spymaster_last_room') || '');
+  const [name, setName] = useState(() => localStorage.getItem('spymaster_player_name') || '');
 
   const handleCreate = () => {
     if (!name.trim()) {
       alert("Please enter your name first!");
       return;
     }
+    localStorage.setItem('spymaster_player_name', name.trim());
     const newRoomId = Math.random().toString(36).substring(2, 6).toUpperCase();
     onJoinRoom(newRoomId, name.trim());
   };
@@ -21,6 +22,8 @@ const Lobby: React.FC<LobbyProps> = ({ onJoinRoom }) => {
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (roomId.trim() && name.trim()) {
+      localStorage.setItem('spymaster_player_name', name.trim());
+      localStorage.setItem('spymaster_last_room', roomId.trim().toUpperCase());
       onJoinRoom(roomId.trim().toUpperCase(), name.trim());
     }
   };

@@ -19,6 +19,13 @@ export interface Player {
     joinedAt: number;
 }
 
+export interface Clue {
+    word: string;
+    number: number;
+    team: Team;
+    timestamp: number;
+}
+
 export interface GameState {
     board: Card[];
     currentTurn: 'red' | 'blue';
@@ -31,6 +38,8 @@ export interface GameState {
     status: GameStatus;
     players: Record<string, Player>;
     hostId: string;
+    clues: Clue[];
+    guessesRemaining: number | null;
 }
 
 export interface Room {

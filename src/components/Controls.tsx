@@ -2,6 +2,7 @@ import React from 'react';
 import { RefreshCw, SkipForward } from 'lucide-react';
 import { clsx } from 'clsx';
 import { Team } from '../types';
+import ClueInput from './ClueInput';
 
 interface ControlsProps {
     scores: { red: number; blue: number };
@@ -13,6 +14,8 @@ interface ControlsProps {
     onToggleSpymaster: () => void;
     onEndTurn: () => void;
     onNewGame: () => void;
+    onGiveClue: (word: string, number: number) => void;
+    clueGiven: boolean;
 }
 
 const Controls: React.FC<ControlsProps> = ({
@@ -20,9 +23,12 @@ const Controls: React.FC<ControlsProps> = ({
     currentTurn,
     winner,
     isMyTurn,
+    isSpymaster,
     isHost,
     onEndTurn,
     onNewGame,
+    onGiveClue,
+    clueGiven,
 }) => {
     return (
         <div className="w-full max-w-4xl mx-auto p-4 flex flex-col gap-4">
@@ -61,7 +67,15 @@ const Controls: React.FC<ControlsProps> = ({
             </div>
 
             {/* Bottom Bar: Actions */}
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                    {isSpymaster && isMyTurn && !winner && (
+                        <div className="max-w-md">
+                            <ClueInput onGiveClue={onGiveClue} disabled={clueGiven} />
+                        </div>
+                    )}
+                </div>
+
                 <div className="flex items-center gap-2">
                     <button
                         onClick={onEndTurn}
