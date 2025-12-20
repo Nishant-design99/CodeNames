@@ -1,8 +1,11 @@
 import { useState } from 'react';
 import { useGame } from './hooks/useGame';
+import { useTheme } from './hooks/useTheme';
+import { Sun, Moon, HelpCircle } from 'lucide-react';
 import GameBoard from './components/GameBoard';
 import Controls from './components/Controls';
 import Lobby from './components/Lobby';
+import HowToPlayModal from './components/HowToPlayModal';
 import WaitingRoom from './components/WaitingRoom';
 import WinnerOverlay from './components/WinnerOverlay';
 import ClueHistory from './components/ClueHistory';
@@ -12,18 +15,50 @@ import ScoreBoard from './components/ScoreBoard';
 
 function App() {
   const [roomId, setRoomId] = useState<string | null>(null);
+  const { theme, toggleTheme } = useTheme();
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   const { gameState, loading, playerId, actions } = useGame(roomId || undefined);
+
+  // Check for room in URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const roomFromUrl = urlParams.get('room');
 
   const handleJoin = (id: string, name: string) => {
     setRoomId(id);
     actions.joinRoom(name, id);
+
+    // Update URL to include room code
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('room', id);
+    window.history.pushState({}, '', newUrl.toString());
   };
+
+  const handleLeave = () => {
+    setRoomId(null);
+    // Clear room from URL
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete('room');
+    window.history.pushState({}, '', newUrl.toString());
+  }
 
   if (!roomId) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white">
-        <Lobby onJoinRoom={handleJoin} />
+      <div className="min-h-screen text-gray-900 dark:text-white relative transition-colors duration-500">
+        <div className="fixed inset-0 z-[-1] bg-gray-50 dark:bg-gray-950 transition-colors duration-500">
+          <div className="absolute inset-0 bg-[url('/bg-pattern-light.png')] dark:bg-[url('/bg-pattern.png')] opacity-[0.6] dark:opacity-[0.15] bg-[length:300px_300px]" />
+          <div className="absolute inset-0 bg-radial-gradient from-transparent to-gray-200/50 dark:to-gray-950/80" />
+        </div>
+
+        <button
+          onClick={toggleTheme}
+          className="absolute top-4 right-4 z-50 p-3 rounded-full bg-white/50 dark:bg-black/30 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:scale-110 transition-all shadow-lg"
+          title="Toggle Theme"
+        >
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+
+        <Lobby onJoinRoom={handleJoin} initialRoomId={roomFromUrl || undefined} />
       </div>
     );
   }
@@ -35,30 +70,53 @@ function App() {
   const bluePlayers = Object.values(gameState.players || {}).filter(p => p.team === 'blue');
 
   return (
-    <div className={`min-h-screen text-gray-900 flex flex-col transition-colors duration-500 ${gameState.currentTurn === 'red' ? 'bg-red-50' : 'bg-blue-50'
-      }`}>
-      <header className="bg-white border-b border-gray-200 p-4 sticky top-0 z-10 shadow-sm">
+    <div className={`min-h-screen text-gray-900 dark:text-gray-100 flex flex-col transition-colors duration-500 relative`}>
+      {/* Background Layer */}
+      <div className="fixed inset-0 z-[-1] bg-gray-50 dark:bg-gray-950 transition-colors duration-500">
+        <div className="absolute inset-0 bg-[url('/bg-pattern-light.png')] dark:bg-[url('/bg-pattern.png')] opacity-[0.9] dark:opacity-[0.15] bg-[length:300px_300px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-100/50 to-transparent dark:from-gray-950/80" />
+      </div>
+
+      <header className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10 shadow-lg backdrop-blur-md transition-colors duration-500">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-red-600 to-blue-600 bg-clip-text text-transparent cursor-pointer" onClick={() => setRoomId(null)}>
+          <h1 className="text-2xl font-black bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent cursor-pointer tracking-widest filter drop-shadow-sm" onClick={handleLeave}>
             SPYMASTER
           </h1>
           <div className="flex items-center gap-4">
-            <div className="px-3 py-1 bg-gray-100 rounded-lg font-mono text-sm font-bold text-gray-600">
-              ROOM: {roomId}
+            <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg font-mono text-sm font-bold text-gray-600 dark:text-gray-300 shadow-inner">
+              ROOM: <span className="text-gray-900 dark:text-white tracking-widest">{roomId}</span>
             </div>
             {myPlayer && (
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <span className={myPlayer.team === 'red' ? 'text-red-600' : myPlayer.team === 'blue' ? 'text-blue-600' : 'text-gray-600'}>
+              <div className="flex items-center gap-3 text-sm font-medium">
+                <span className={`filter drop-shadow-sm font-bold ${myPlayer.team === 'red' ? 'text-red-600 dark:text-red-400' : myPlayer.team === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
                   {myPlayer.name}
                 </span>
-                <span className="px-2 py-0.5 bg-gray-100 rounded text-xs uppercase text-gray-500">
+                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs uppercase text-gray-500 dark:text-gray-400 font-bold">
                   {myPlayer.role}
                 </span>
               </div>
             )}
+
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
+
             <button
-              onClick={() => setRoomId(null)}
-              className="text-sm text-gray-500 hover:text-gray-900 underline"
+              onClick={() => setShowHowToPlay(true)}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+              title="How to Play"
+            >
+              <HelpCircle size={18} />
+            </button>
+
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            <button
+              onClick={handleLeave}
+              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors underline decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-white"
             >
               Leave
             </button>
@@ -161,6 +219,11 @@ function App() {
           </div>
         )}
       </main>
+      {/* Global How to Play Modal */}
+      <HowToPlayModal
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
+      />
     </div>
   );
 }

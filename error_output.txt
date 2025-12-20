@@ -1,0 +1,16 @@
+
+> spymaster-game@0.0.0 dev D:\Projects\Spymaster
+> vite
+
+'vite' is not recognized as an internal or external command,
+operable program or batch file.
+npm ERR! code ELIFECYCLE
+npm ERR! errno 1
+npm ERR! spymaster-game@0.0.0 dev: `vite`
+npm ERR! Exit status 1
+npm ERR! 
+npm ERR! Failed at the spymaster-game@0.0.0 dev script.
+npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
+
+npm ERR! A complete log of this run can be found in:
+npm ERR!     C:\Users\pnish\AppData\Roaming\npm-cache\_logs\2025-12-20T19_10_41_864Z-debug.log

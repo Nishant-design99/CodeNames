@@ -19,21 +19,21 @@ const Card: React.FC<CardProps> = ({ card, isSpymaster, onClick, disabled }) => 
             switch (type) {
                 case 'red': return 'bg-red-500 text-white border-red-600';
                 case 'blue': return 'bg-blue-500 text-white border-blue-600';
-                case 'neutral': return 'bg-amber-100 text-amber-800 border-amber-200 opacity-50';
+                case 'neutral': return 'bg-amber-100 text-amber-800 border-amber-200 opacity-50 dark:bg-amber-900 dark:text-amber-100 dark:border-amber-800';
                 case 'assassin': return 'bg-gray-900 text-white border-gray-950';
             }
         }
 
         if (isSpymaster) {
             switch (type) {
-                case 'red': return 'bg-red-100 text-red-900 border-red-200';
-                case 'blue': return 'bg-blue-100 text-blue-900 border-blue-200';
-                case 'neutral': return 'bg-amber-50 text-amber-900 border-amber-100';
-                case 'assassin': return 'bg-gray-200 text-gray-900 border-gray-300';
+                case 'red': return 'bg-red-100 text-red-900 border-red-200 dark:bg-red-900/40 dark:text-red-200 dark:border-red-800';
+                case 'blue': return 'bg-blue-100 text-blue-900 border-blue-200 dark:bg-blue-900/40 dark:text-blue-200 dark:border-blue-800';
+                case 'neutral': return 'bg-amber-50 text-amber-900 border-amber-100 dark:bg-amber-900/40 dark:text-amber-200 dark:border-amber-800';
+                case 'assassin': return 'bg-gray-200 text-gray-900 border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600';
             }
         }
 
-        return 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200';
+        return 'bg-white text-gray-800 hover:bg-gray-50 border-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600 dark:border-gray-600 shadow-sm';
     };
 
     return (
