@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Custom scrollbar for webkit browsers */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800 rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400 dark:hover:bg-gray-500;
+  }
+
+  /* Improve touch scrolling on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
 @layer utilities {
   .animate-pop-up {
     animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -32,5 +53,18 @@
     100% {
       transform: perspective(1000px) rotateY(360deg);
     }
+  }
+
+  /* Touch-friendly button utility */
+  .btn-touch {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Prevent text selection on buttons and interactive elements */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 }

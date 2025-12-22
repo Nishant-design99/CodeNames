@@ -19,7 +19,7 @@ const TeamSidebar: React.FC<TeamSidebarProps> = ({ team, players, currentTurn, c
 
     return (
         <div className={clsx(
-            "w-full lg:w-64 p-4 rounded-xl border shadow-sm h-fit transition-all duration-300",
+            "w-full lg:w-64 p-3 sm:p-4 rounded-xl border shadow-sm h-fit transition-all duration-300",
             bgColor,
             borderColor,
             currentTurn === team ? "ring-2 ring-offset-2 ring-offset-white dark:ring-offset-gray-900" : "opacity-80 grayscale-[0.3]",
@@ -27,8 +27,8 @@ const TeamSidebar: React.FC<TeamSidebarProps> = ({ team, players, currentTurn, c
             className,
             "text-gray-900 dark:text-gray-100"
         )}>
-            <div className="flex items-center justify-between mb-4">
-                <h2 className={clsx("text-lg font-bold uppercase tracking-wider", teamColor)}>
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h2 className={clsx("text-base sm:text-lg font-bold uppercase tracking-wider", teamColor)}>
                     {team} Team
                 </h2>
                 <span className={clsx("text-xs font-bold px-2 py-1 rounded-full bg-white/60 dark:bg-black/40", teamColor)}>

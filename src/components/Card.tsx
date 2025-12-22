@@ -42,8 +42,9 @@ const Card: React.FC<CardProps> = ({ card, isSpymaster, onClick, disabled }) => 
             disabled={disabled || revealed}
             className={twMerge(
                 'relative w-full aspect-[4/3] rounded-lg shadow-sm border-b-4 transition-all duration-300',
-                'flex items-center justify-center p-2',
-                'text-sm sm:text-base md:text-lg font-bold uppercase tracking-wider break-words text-center',
+                'flex items-center justify-center p-1.5 xs:p-2',
+                'text-xs xs:text-sm sm:text-base font-bold uppercase tracking-wide break-words text-center leading-tight',
+                'btn-touch no-select',
                 getBackgroundColor(),
                 !revealed && !disabled && 'hover:-translate-y-1 hover:shadow-md active:translate-y-0 active:shadow-sm cursor-pointer',
                 (revealed || disabled) && 'cursor-default',
@@ -52,7 +53,7 @@ const Card: React.FC<CardProps> = ({ card, isSpymaster, onClick, disabled }) => 
             )}
         >
             <span className={clsx(
-                "transition-opacity duration-500",
+                "transition-opacity duration-500 px-0.5",
                 revealed && type === 'assassin' && "text-red-500"
             )}>
                 {word}
@@ -61,7 +62,7 @@ const Card: React.FC<CardProps> = ({ card, isSpymaster, onClick, disabled }) => 
             {/* Spymaster Indicator (Optional icon or marker) */}
             {isSpymaster && !revealed && (
                 <div className={clsx(
-                    "absolute top-1 right-1 w-2 h-2 rounded-full",
+                    "absolute top-1 right-1 w-1.5 h-1.5 xs:w-2 xs:h-2 rounded-full",
                     type === 'red' && "bg-red-500",
                     type === 'blue' && "bg-blue-500",
                     type === 'assassin' && "bg-black",

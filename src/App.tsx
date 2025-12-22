@@ -77,46 +77,57 @@ function App() {
         <div className="absolute inset-0 bg-gradient-to-t from-gray-100/50 to-transparent dark:from-gray-950/80" />
       </div>
 
-      <header className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700 p-4 sticky top-0 z-10 shadow-lg backdrop-blur-md transition-colors duration-500">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <h1 className="text-2xl font-black bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent cursor-pointer tracking-widest filter drop-shadow-sm" onClick={handleLeave}>
-            SPYMASTER
-          </h1>
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg font-mono text-sm font-bold text-gray-600 dark:text-gray-300 shadow-inner">
+      <header className="bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 sticky top-0 z-10 shadow-lg backdrop-blur-md transition-colors duration-500">
+        <div className="max-w-6xl mx-auto flex flex-col xs:flex-row items-center justify-between gap-2">
+          <div className="flex items-center justify-between w-full xs:w-auto">
+            <h1 className="text-xl sm:text-2xl font-black bg-gradient-to-r from-red-500 to-blue-500 bg-clip-text text-transparent cursor-pointer tracking-widest filter drop-shadow-sm" onClick={handleLeave}>
+              SPYMASTER
+            </h1>
+            {/* Room code visible on all screens, compact on mobile */}
+            <div className="xs:hidden px-2 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg font-mono text-xs font-bold text-gray-600 dark:text-gray-300 shadow-inner">
+              <span className="text-gray-900 dark:text-white tracking-widest">{roomId}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 sm:gap-4 w-full xs:w-auto justify-between xs:justify-end">
+            {/* Room code for larger screens */}
+            <div className="hidden xs:block px-3 py-1 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg font-mono text-sm font-bold text-gray-600 dark:text-gray-300 shadow-inner">
               ROOM: <span className="text-gray-900 dark:text-white tracking-widest">{roomId}</span>
             </div>
+
             {myPlayer && (
-              <div className="flex items-center gap-3 text-sm font-medium">
-                <span className={`filter drop-shadow-sm font-bold ${myPlayer.team === 'red' ? 'text-red-600 dark:text-red-400' : myPlayer.team === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
+              <div className="flex items-center gap-2 text-xs sm:text-sm font-medium">
+                <span className={`filter drop-shadow-sm font-bold truncate max-w-[80px] sm:max-w-none ${myPlayer.team === 'red' ? 'text-red-600 dark:text-red-400' : myPlayer.team === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
                   {myPlayer.name}
                 </span>
-                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs uppercase text-gray-500 dark:text-gray-400 font-bold">
+                <span className="hidden sm:inline px-2 py-0.5 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded text-xs uppercase text-gray-500 dark:text-gray-400 font-bold">
                   {myPlayer.role}
                 </span>
               </div>
             )}
 
-            <div className="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
+            <div className="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
 
             <button
               onClick={() => setShowHowToPlay(true)}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+              className="btn-touch p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors no-select"
               title="How to Play"
+              aria-label="How to Play"
             >
               <HelpCircle size={18} />
             </button>
 
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors"
+              className="btn-touch p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors no-select"
+              aria-label="Toggle Theme"
             >
               {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
             <button
               onClick={handleLeave}
-              className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors underline decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-white"
+              className="btn-touch text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors underline decoration-gray-300 dark:decoration-gray-600 hover:decoration-gray-900 dark:hover:decoration-white no-select"
             >
               Leave
             </button>

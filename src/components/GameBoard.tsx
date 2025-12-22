@@ -11,7 +11,7 @@ interface GameBoardProps {
 
 const GameBoard: React.FC<GameBoardProps> = ({ board, isSpymaster, onCardClick, canInteract }) => {
     return (
-        <div className="grid grid-cols-5 gap-2 sm:gap-3 md:gap-4 w-full max-w-4xl mx-auto p-4">
+        <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 w-full max-w-4xl mx-auto p-2 sm:p-4">
             {board.map((card) => (
                 <Card
                     key={card.id}
